@@ -14,9 +14,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+
+def f(m, c, x):
+    return np.exp(m * x) + c
+
 def main(argv):
-    m = argv[2]
-    c = argv[3]
+    m = float(argv[2])
+    c = float(argv[3])
+    # m = 0.291861
+    # c = 0.131439
 
     point_list = []
     with open(argv[1]) as data_file:
@@ -26,8 +32,11 @@ def main(argv):
             point_list.append(np.fromstring(line, dtype=float, sep=' '))
 
     points = np.array(point_list)
-    print(points.transpose()[0])
-    plt.plot(points.transpose()[0], points.transpose()[1])
+    plt.plot(points.transpose()[0], points.transpose()[1], "bo")
+
+    x = np.arange(0.0, 5.5, 0.01)
+    s = f(m, c, x)
+    line, = plt.plot(x, s, lw=2)
     plt.show()
 
 
