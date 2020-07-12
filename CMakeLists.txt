@@ -31,6 +31,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME}
   src/main.cc
+  src/GaussNewton.cc
 )
 
 target_link_libraries(${PROJECT_NAME}

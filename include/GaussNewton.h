@@ -14,16 +14,22 @@
 
 #include <iostream>
 #include <vector>
+#include <math.h>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
-class GaussNewton() {
+class GaussNewton {
  public:
-  GaussNewton(const std::vector<std::vector<double>> & datas);
+  GaussNewton(const std::vector<std::vector<double>>& datas,
+              const int max_iterations);
 
   ~GaussNewton();
 
   void IterateOnce();
 
   void Optimize();
+
+  std::vector<double> GetOptimizedVariables() const { return variables_; }
 
  private:
   std::vector<std::vector<double>> datas_;

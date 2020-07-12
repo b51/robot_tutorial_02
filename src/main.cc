@@ -14,6 +14,8 @@
 #include <vector>
 #include <ceres/ceres.h>
 
+#include "GaussNewton.h"
+
 void ReadDataFromFile(const std::string& fullpath,
                       std::vector<std::vector<double>>& datas) {
   std::ifstream f;
@@ -91,10 +93,11 @@ int main(int argc, char** argv) {
    *  Optimize curve with Gauss Newton Non-linear Least Squares method
    *  which written in your own code
    */
+  int max_iterations = 50;
   std::vector<double> variables;
-  GaussNewton gauss_newton(datas);
-  gauss_newton.Iterate();
-  results = gauss_newton.GetOptimizedVariables();
+  GaussNewton gauss_newton(datas, max_iterations);
+  gauss_newton.Optimize();
+  variables = gauss_newton.GetOptimizedVariables();
   
   return 0;
 }

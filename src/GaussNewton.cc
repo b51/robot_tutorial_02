@@ -11,6 +11,8 @@
 
 #include "GaussNewton.h"
 
+constexpr double EPSILON = 1e-5;
+
 // constructor
 GaussNewton::GaussNewton(const std::vector<std::vector<double>>& datas,
                          const int max_iterations)
@@ -23,10 +25,6 @@ GaussNewton::GaussNewton(const std::vector<std::vector<double>>& datas,
 
 // deconstructor
 GaussNewton::~GaussNewton() {}
-
-void GaussNewton::SetInitialVariable(const std::vector<double>& variables) {
-  variables_ = variables;
-}
 
 /**
  *  Gauss-Newton method:
@@ -47,7 +45,7 @@ void GaussNewton::SetInitialVariable(const std::vector<double>& variables) {
  *    J^T * J * dt = - J^T * error(t)
  *  Solve dt and update once
  */
-void IterateOnce() {
+void GaussNewton::IterateOnce() {
   double m = variables_[0];
   double c = variables_[1];
 
@@ -57,24 +55,30 @@ void IterateOnce() {
   for (size_t i = 0; i < datas_.size(); i++) {
     double x = datas_[i][0];
     double y = datas_[i][1];
+    double error = exp(m * x) + c - y;
 
-    Eigen::Vector2d Jacobian = Eigen::Vector2d::Zero();
+    Eigen::Matrix<double, 1, 2> Jacobian = Eigen::Matrix<double, 1, 2>::Zero();
     Jacobian[0] = x * exp(m * x);
     Jacobian[1] = 1;
 
     A += Jacobian.transpose() * Jacobian;
-    b += -1.0 * Jacobian.transpose() * error();
+    b += -1.0 * Jacobian.transpose() * error;
   }
+  Eigen::FullPivLU<Eigen::MatrixXd> lu(A);
+  Eigen::Vector2d delta_t = lu.solve(b);
+
+  variables_[0] += delta_t[0];
+  variables_[1] += delta_t[1];
 }
 
-void Optimize() {
+void GaussNewton::Optimize() {
   std::cout << "Initial value of m: " << variables_[0]
             << ", c: " << variables_[1] << std::endl;
 
   double last_eTe = 0.0;
-  double m = variables_[0];
-  double c = variables_[1];
   for (int i = 0; i < max_iterations_; i++) {
+    double m = variables_[0];
+    double c = variables_[1];
     double eTe = 0.0;
     for (size_t j = 0; j < datas_.size(); j++) {
       double x = datas_[j][0];
@@ -88,7 +92,7 @@ void Optimize() {
     if (eTe < EPSILON or std::abs(eTe - last_eTe) < EPSILON) {
       std::cout << "Optimization done with " << i << " times iteration" << std::endl;
       std::cout << "error: " << eTe << std::endl;
-      std::cout << "Optimized m: " << variables_[0] << ", c: " << variables_[1];
+      std::cout << "Optimized m: " << variables_[0] << ", c: " << variables_[1] << std::endl;
       return;
     }
 
