@@ -35,8 +35,8 @@ GaussNewton::~GaussNewton() {}
  *    error(t) = e^(mx) + c
  *
  *  Taylor series of error(x), J -> Jacobian
- *    error(t + dt) = error(t) + J * dt 
- *    ==> 
+ *    error(t + dt) = error(t) + J * dt
+ *    ==>
  *    F(t+dt) = [error(t + dt)^T * error(t + dt)]
  *            = (error(t) + J * dt)^T * (error(t) + J * dt)
  *            = error(t) * error(t) + (J*dt)^T * error(t) + error(t) * (J*dt) + (J*dt)^T * (J*dt)

@@ -16,6 +16,15 @@
 
 #include "GaussNewton.h"
 
+void CallPythonPlot(double m1, double c1, double m2, double c2) {
+  // plot_curve.py Usage: python plot_curve.py sample.txt m c
+  std::string cmd = "python ../scripts/plot_curve.py ../data/sample.txt ";
+  cmd += std::to_string(m1) + " " + std::to_string(c1) + " " + std::to_string(m2)
+         + " " + std::to_string(c2);
+  std::cout << cmd << std::endl;
+  system(cmd.c_str());
+}
+
 void ReadDataFromFile(const std::string& fullpath,
                       std::vector<std::vector<double>>& datas) {
   std::ifstream f;
@@ -98,6 +107,7 @@ int main(int argc, char** argv) {
   GaussNewton gauss_newton(datas, max_iterations);
   gauss_newton.Optimize();
   variables = gauss_newton.GetOptimizedVariables();
-  
+  CallPythonPlot(m, c, variables[m], variables[c]);
+
   return 0;
 }

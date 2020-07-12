@@ -19,10 +19,10 @@ def f(m, c, x):
     return np.exp(m * x) + c
 
 def main(argv):
-    m = float(argv[2])
-    c = float(argv[3])
-    # m = 0.291861
-    # c = 0.131439
+    m1 = float(argv[2])
+    c1 = float(argv[3])
+    m2 = float(argv[4])
+    c2 = float(argv[5])
 
     point_list = []
     with open(argv[1]) as data_file:
@@ -35,8 +35,10 @@ def main(argv):
     plt.plot(points.transpose()[0], points.transpose()[1], "bo")
 
     x = np.arange(0.0, 5.5, 0.01)
-    s = f(m, c, x)
-    line, = plt.plot(x, s, lw=2)
+    s1 = f(m1, c1, x)
+    s2 = f(m2, c2, x)
+    line, = plt.plot(x, s1, color = "blue", lw=2)
+    line, = plt.plot(x, s2, color = "red", lw=2)
     plt.show()
 
 
