@@ -13,6 +13,8 @@
 #include <fstream>
 #include <vector>
 #include <ceres/ceres.h>
+#include <Eigen/Core>
+#include <Eigen/Dense>
 
 #include "GaussNewton.h"
 
@@ -32,7 +34,7 @@ void ReadDataFromFile(const std::string& fullpath,
   f.open(fullpath.c_str());
   std::string line;
 
-  // read data frome file line by line
+  // read data frome file line toucjby line
   while (std::getline(f, line)) {
     std::istringstream iss(line);
     std::vector<double> data;
@@ -59,6 +61,7 @@ struct ExponentialResidual {
                                         const T* const c,
                                         T* residual) const {
     /* Fill here */
+    residual[0] = T(y_) - exp(m[0] * T(x_) + c[0]);
     return true;
   }
  private:
@@ -102,12 +105,28 @@ int main(int argc, char** argv) {
    *  Optimize curve with Gauss Newton Non-linear Least Squares method
    *  which written in your own code
    */
-  int max_iterations = 50;
+
+  std::cout<<std::endl<<"GAUSS NEWTON"<<std::endl;
+
+
+  int max_iterations = 50;//GN算法拟合
   std::vector<double> variables;
   GaussNewton gauss_newton(datas, max_iterations);
   gauss_newton.Optimize();
   variables = gauss_newton.GetOptimizedVariables();
   CallPythonPlot(m, c, variables[m], variables[c]);
+
+
+  std::cout<<std::endl<<"LM"<<std::endl;
+
+  max_iterations = 100;//LM算法拟合
+  std::vector<double> variables1;
+ GaussNewton lm(datas, max_iterations);
+ lm.Optimize();
+ variables = lm.GetOptimizedVariables();
+ CallPythonPlot(m, c, variables[m], variables[c]);
+
+
 
   return 0;
 }

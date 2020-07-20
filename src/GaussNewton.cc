@@ -18,9 +18,11 @@ GaussNewton::GaussNewton(const std::vector<std::vector<double>>& datas,
                          const int max_iterations)
     : datas_(datas),
       max_iterations_(max_iterations) {
+  lamda=500;
+  jd=1;
   variables_.resize(2);
   variables_[0] = 0.0;
-  variables_[0] = 0.0;
+  variables_[1] = 0.0;
 }
 
 // deconstructor
@@ -46,17 +48,63 @@ GaussNewton::~GaussNewton() {}
  *  Solve dt and update once
  */
 void GaussNewton::IterateOnce() {
+
   double m = variables_[0];
   double c = variables_[1];
 
   /**
    *  GaussNewton iterate once to update variables
-   *  Pleaase fill here
+   *  Please fill here
    */
+  Eigen::MatrixXd error_;
+  Eigen::MatrixXd J_; // 雅克比矩阵
+  Eigen::Matrix2d H_; // H矩阵
+  Eigen::Matrix2d H_lm;//LM算法下的H矩阵
+  Eigen::Matrix2d I;//二阶单位阵
+  Eigen::Vector2d B_;
+  Eigen::Vector2d delta_t;
+  Eigen::VectorXd J_d(datas_.size());
+  I.setIdentity();
+
+  J_ .resize(datas_.size(), 2);
+  error_.resize(datas_.size(), 1);
+
+
+
+  for (size_t i = 0; i < datas_.size(); i++) {
+	  std::vector<double>& data = datas_.at(i);
+                double& x = data.at(0);
+                double& y = data.at(1);
+                double j1 = -x*exp(m * x + c);//对m的偏导
+                double j2 = -exp(m * x + c);//对c的偏导
+                J_(i, 0 ) = j1;
+                J_(i, 1) = j2;
+                error_(i, 0) = y - exp(m * x + c);
+            }
+  H_=J_.transpose() * J_;//求Hessian矩阵
+  B_ = -J_.transpose() * error_;
+   
+//    H * delta_t = - J^T * error(t)
+
+  if (max_iterations_==100){
+  H_lm=H_+lamda*I;
+  delta_t = H_lm.ldlt().solve(B_);//LM算法下的dt
+  J_d=J_*delta_t;
+  jd=0;
+  for(size_t i=0; i < datas_.size();i++){
+        jd+=J_d[i]*J_d[i];//计算展开后一阶项的模
+  }
+ // std::cout<<"H_lm:  "<<H_lm<<"H_:  "<<H_<<std::endl; 
+  }
+  else delta_t = H_.ldlt().solve(B_);//GN算法下的dt
+
+
+
+
 
   // After calculation, upate variables with results
-  /* variables_[0] += delta_t[0]; */
-  /* variables_[1] += delta_t[1]; */
+  variables_[0] += delta_t[0]; 
+  variables_[1] += delta_t[1]; 
 }
 
 void GaussNewton::Optimize() {
@@ -74,7 +122,7 @@ void GaussNewton::Optimize() {
       double error = exp(m * x) + c - y;
       eTe += error * error;
     }
-    std::cout << "iteration " << i << " error: " << eTe << std::endl;
+    std::cout << "iteration " << i << " error: " << eTe << " lamda: "<<lamda<<std::endl;
 
     // if error less than some value or error change little, break the optimize
     if (eTe < EPSILON or std::abs(eTe - last_eTe) < EPSILON) {
@@ -85,6 +133,12 @@ void GaussNewton::Optimize() {
     }
 
     IterateOnce();
+ if (max_iterations_==100){//LM算法下lamda的调节
+      	 if ((eTe-last_eTe)/jd<0.25) lamda=lamda*2;//泰勒展开近似不精确，增大lamda
+    	if ((eTe-last_eTe)/jd>0.75) lamda=lamda/3;//泰勒展开近似较精确，减少lamda
+ }
+
     last_eTe = eTe;
-  }
+
+}
 }

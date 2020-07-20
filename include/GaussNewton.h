@@ -37,6 +37,9 @@ class GaussNewton {
   int max_iterations_;
 
   std::vector<double> variables_;
+
+
+  double jd,lamda;
 };
 
 #endif
