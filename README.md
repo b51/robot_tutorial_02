@@ -1,4 +1,4 @@
-## Task 01
+## Tutorial 02
 ### What this repository for
 * 熟悉 ceres 函数库
 * 熟悉 高斯牛顿优化方法
@@ -44,3 +44,11 @@ $ ./curve_fitting ../data/sample.txt
 
 ### Reference
 * ceres 优化方法参考地址: http://ceres-solver.org/nnls_tutorial.html#curve-fitting
+
+### Solution
+* 参考解决方案参照 solution branch
+
+```bash
+$ git pull origin
+$ git checkout solution
+```
